@@ -3,8 +3,8 @@
 
 using namespace std;
 
-#define REP(i,n) for(int i=0;i<(n);i++)
-#define ALL(a)  (a).begin(),(a).end()
+#define rep(i,n) for(int i=0;i<(n);i++)
+#define all(a)  (a).begin(),(a).end()
 using ld = long double;
 
 // ref: https://mieruca-ai.com/ai/viterbi_algorithm/
@@ -51,16 +51,16 @@ int main(int argc, char const* argv[])
   // 1.初期確率からdelta[0][i]を求める。psi[0][i]=-1に設定する
   vector<vector<ld>> delta(os.size(), vector<ld>(ps.size()));
   vector<vector<int>> psi(os.size(), vector<int>(ps.size()));
-  REP(i,ps.size()) {
+  rep(i,ps.size()) {
     delta[0][i] = f(pi[i], o[i][om[os[0]]]);
     psi[0][i] = -1;
     if(debug) printf("delta[0][%d]: %Lf\n", i,delta[0][i]);
     if(debug) printf("psi[0][%d]: %d\n", i,psi[0][i]);
   }
   // 2. delta[t+1][j] = max_i(log_(delta[t][i]) + log_(a[i][j]) + log_(o[j][om[os[t+1]]]))
-  REP(t,os.size()-1)REP(j,ps.size()) {
+  rep(t,os.size()-1)rep(j,ps.size()) {
     pair<int,ld> max_(-1,-1.0); // (id, log_probability)
-    REP(i,ps.size()) {
+    rep(i,ps.size()) {
       ld tmp = f(delta[t][i], a[i][j], o[j][om[os[t+1]]]);
       if(debug) printf("delta[%d][%d]:%Lf, a[%d][%d]:%Lf, o[%d][%d]:%Lf\n", t,i,delta[t][i],i,j,a[i][j],j,om[os[t+1]],o[j][om[os[t+1]]]);
       if(max_.second<tmp) max_ = make_pair(i,tmp);
@@ -72,19 +72,19 @@ int main(int argc, char const* argv[])
   // 3. max_i(delta[os.size()-1][i])から最大尤度の状態kを見つけ、
   //    psi[os.size()-1][k]から逆に辿ることで最尤パスを出力する
   pair<int,ld> max_(-1,-1.0); // (id, log_probability)
-  REP(i,ps.size()) {
+  rep(i,ps.size()) {
     ld tmp = delta[os.size()-1][i];
     if(max_.second<tmp) max_ = make_pair(i,tmp);
   }
   vector<int> mlp; // maximum likelihood path
   mlp.push_back(max_.first);
-  REP(i,os.size()-1) {
+  rep(i,os.size()-1) {
     max_.first = psi[os.size()-1-i][max_.first];
     mlp.push_back(max_.first);
   }
-  reverse(ALL(mlp));
+  reverse(all(mlp));
 
-  REP(i,os.size()) {
+  rep(i,os.size()) {
     printf("%s: %s\n", os[i].c_str(), ps[mlp[i]].c_str());
   }
 
